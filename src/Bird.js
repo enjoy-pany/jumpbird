@@ -30,6 +30,8 @@
         flyStartX: 200, //小鸟往上飞的起始y轴坐标
         flyStartTime: 0, //小鸟飞行起始时间
 
+        v0: 0, //初始速度
+
         getReady: function() {
             // this.x = this.startX;
             // this.y = this.startY;
@@ -46,20 +48,22 @@
 
             if(ns.groundTween) ns.groundTween.stop()
         },
-        startFly: function() {
+        startFly: function(dt) {
             this.flyStartX = this.x
             this.flyEnd =false
             this.flyStartTime = +new Date();
+            this.v0 = dt*1.2
             if(this.tween) this.tween.pause();
         },
         onUpdate: function() {
             if(this.flyEnd) return
             //飞行时间
             var t = ((+new Date()) - this.flyStartTime)/1000;
-            var v0 = 1000;
+            var v0 = this.v0;
+            var v1 = 1000;
             var g = 1200;
             var v = v0 - g*t
-            var h = v0*t - .5*g*t*t;
+            var h = 2/3*v0*t - .5*g*t*t;
             var l = .4*v0*t;;
             //y轴坐标
             var y = this.flyStartY - h;

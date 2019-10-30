@@ -19,6 +19,9 @@
         gameReadyScene: null,
         gameOverScene: null,
 
+        startTime: null,
+        endTime: null,
+
         init: function() {
             this.asset = new game.Asset();
             this.asset.on('complete', function(e) { // 注册监听
@@ -53,7 +56,9 @@
 
             //绑定交互事件
             this.stage.enableDOMEvent(Hilo.event.POINTER_START, true);
-            this.stage.on(Hilo.event.POINTER_START, this.onUserInput.bind(this));
+            this.stage.enableDOMEvent(Hilo.event.POINTER_END, true);
+            this.stage.on(Hilo.event.POINTER_START, this.onUserInputStart.bind(this));
+            this.stage.on(Hilo.event.POINTER_END, this.onUserInputEnd.bind(this));
             
             // 游戏元素初始化
             this.initBackground();
@@ -118,13 +123,19 @@
         gameReady() {
             this.bird.getReady();
         },
-        onUserInput: function(e) {
+        onUserInputStart: function(e) {
+            this.startTime = +new Date()
             // if (this.state !== 'over' && !this.gameOverScene.contains(e.eventTarget)) {
                 //启动游戏场景
                 // if (this.state !== 'playing') this.gameStart();
                 //控制小鸟往上飞
-                this.bird.startFly();
+                // this.bird.startFly();
             // }
         },
+        onUserInputEnd: function(e) {
+            this.endTime = +new Date()
+            var diffTime = this.endTime - this.startTime
+            this.bird.startFly(diffTime);
+        }
     }
 })();

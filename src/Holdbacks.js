@@ -35,7 +35,7 @@ var Holdbacks = ns.Holdbacks = Hilo.Class.create({
         //x轴最小值
         var downMinX = down.width + 150;
         //随机位置
-        down.y = 645;
+        down.y = 630;
         down.x = (downMinX + (downMaxX - downMinX) * Math.random() >> 0) * index;
         if(index === 1) {
             this.initMoveTween(down.x)
