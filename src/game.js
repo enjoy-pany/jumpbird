@@ -64,6 +64,8 @@
             this.initBackground();
             this.initBird();
             this.initHoldbacks();
+            this.initCurrentScore();
+            this.initScenes();
 
             // 准备游戏
             this.gameReady()
@@ -110,6 +112,7 @@
                 startY: this.height >> 1,
                 groundY: this.ground.y - 12
             }).addTo(this.stage, this.ground.depth - 1);
+            this.bird.on('done', this.flyDone.bind(this));
         },
         initHoldbacks: function() {
             this.holdbacks = new game.Holdbacks({
@@ -120,22 +123,66 @@
                 groundY: this.ground.y
             }).addTo(this.stage, this.ground.depth - 1);
         },
+        initCurrentScore() {
+            //当前分数
+            this.currentScore = new Hilo.BitmapText({
+                id: 'score',
+                glyphs: this.asset.numberGlyphs,
+                textAlign: 'center'
+            }).addTo(this.stage);
+
+            //设置当前分数的位置
+            this.currentScore.x = this.width - this.currentScore.width >> 1;
+            this.currentScore.y = 180;
+        },
+        initScenes() {
+            //结束场景
+            this.gameOverScene = new game.OverScene({
+                id: 'overScene',
+                width: this.width,
+                height: this.height,
+                image: this.asset.over,
+                numberGlyphs: this.asset.numberGlyphs,
+                visible: false
+            }).addTo(this.stage);
+        },
         gameReady() {
+            this.score = 0;
+            this.currentScore.visible = true;
+            this.currentScore.setText(this.score);
             this.bird.getReady();
         },
         onUserInputStart: function(e) {
             this.startTime = +new Date()
-            // if (this.state !== 'over' && !this.gameOverScene.contains(e.eventTarget)) {
-                //启动游戏场景
-                // if (this.state !== 'playing') this.gameStart();
-                //控制小鸟往上飞
-                // this.bird.startFly();
-            // }
+            var me = this;
+            var base = 1;
+            this.inputTimes = setInterval(function(){
+                base-=.02;
+                if(base < 0.4) return;
+                me.bird.scaleX = base;
+                me.bird.scaleY = base;
+            }, 60)
         },
         onUserInputEnd: function(e) {
+            clearInterval(this.inputTimes);
+            Hilo.Tween.to(this.bird, {scaleX:1, scaleY:1}, {time:100});
             this.endTime = +new Date()
             var diffTime = this.endTime - this.startTime
             this.bird.startFly(diffTime);
+        },
+        gameOver: function() {
+                //显示结束场景
+                this.gameOverScene.show();
+                // 隐藏分数
+                this.currentScore.visible =false;
+        },
+        flyDone() {
+            if(this.holdbacks.collisionTest(this.bird)) {
+                this.score+=1;
+                this.currentScore.setText(this.score);
+            }else {
+                this.gameOver();
+            }
         }
     }
 })();

@@ -69,9 +69,10 @@
             var y = this.flyStartY - h;
             var x = this.flyStartX + l;
             if(y<this.flyStartY) {
-                this.y = y
-                this.x = x
+                this.y = y;
+                this.x = x;
             }else {
+                this.fire('done')
                 this.flyEnd = true;
                 ns.groundTween.start()
                 ns.moveTween.start()

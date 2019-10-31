@@ -35,7 +35,7 @@ var Holdbacks = ns.Holdbacks = Hilo.Class.create({
         //x轴最小值
         var downMinX = down.width + 150;
         //随机位置
-        down.y = 630;
+        down.y = 625;
         down.x = (downMinX + (downMaxX - downMinX) * Math.random() >> 0) * index;
         if(index === 1) {
             this.initMoveTween(down.x)
@@ -43,7 +43,7 @@ var Holdbacks = ns.Holdbacks = Hilo.Class.create({
     },
     resetHoses: function() {
         var total = this.children.length;
-        //把已移出屏幕外的管子放到队列最后面，并重置它们的可穿越位置
+        //把已移出屏幕外的管子放到队列最后面，并重置它们的位置
         for(var i = 0; i < this.numOffscreenHoses; i++){
             var downHose = this.getChildAt(0);
             this.setChildIndex(downHose, total - 1);
@@ -67,6 +67,14 @@ var Holdbacks = ns.Holdbacks = Hilo.Class.create({
             onComplete: this.resetHoses.bind(this)
         });
         this.moveTween.pause()
+    },
+    collisionTest(bird) {
+        for(var i=0,length=this.children.length;i<length;i++) {
+            if(bird.hitTestObject(this.children[i],true)) {
+                return true
+            }
+        }
+        return false
     }
 })
 })(window.game)
