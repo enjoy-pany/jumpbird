@@ -147,14 +147,18 @@
             }).addTo(this.stage);
         },
         gameReady() {
-            this.state = 'ready';
+            this.state === 'ready'
             this.score = 0;
             this.currentScore.visible = true;
             this.currentScore.setText(this.score);
             this.bird.getReady();
+            
         },
         onUserInputStart: function(e) {
             if(this.state === 'play') return
+            if(this.state === 'over') {
+                this.restartGame();
+            }
             this.startTime = +new Date()
             var me = this;
             var base = 1;
@@ -167,9 +171,6 @@
         },
         onUserInputEnd: function(e) {
             if(this.state === 'play') return
-            if(this.state === 'over') {
-                this.restartGame();
-            }
             clearInterval(this.inputTimes);
             Hilo.Tween.to(this.bird, {scaleX:1, scaleY:1}, {time:100});
             this.endTime = +new Date()
@@ -190,9 +191,14 @@
         },
         flyDone() {
             if(this.holdbacks.collisionTest(this.bird)) {
-                this.state = 'ready';
-                this.score+=1;
-                this.currentScore.setText(this.score);
+                var me = this;
+                me.score+=1;
+                me.currentScore.setText(me.score);
+                me.bird.startMove(function(){
+                    console.log('ddddd')
+                    me.state = 'ready';
+                });
+                
             }else {
                 this.gameOver();
             }

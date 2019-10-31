@@ -74,15 +74,17 @@
             }else {
                 this.fire('done')
                 this.flyEnd = true;
-                ns.groundTween.start()
-                ns.moveTween.start()
-                Hilo.Tween.to(this, {x:200}, {duration:2000, loop:false, delay:500 ,onComplete: function() {
-                    ns.groundTween.pause()
-                    ns.moveTween.pause()
-                }});
-                
             }
             
+        },
+        startMove(cb) {
+            ns.groundTween.start()
+            ns.moveTween.start()
+            Hilo.Tween.to(this, {x:200}, {duration:2000, loop:false, delay:500 ,onComplete: function() {
+                ns.groundTween.pause();
+                ns.moveTween.pause();
+                cb();
+            }});
         }
      })
 })(window.game);
