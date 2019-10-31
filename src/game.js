@@ -9,7 +9,7 @@
         asset: null,
         stage: null,
         ticker: null,
-        state: null,
+        state: null, // ready: 准备阶段 play:进行中状态 over:游戏结束状态
         score: 0,
 
         bg: null,
@@ -147,12 +147,14 @@
             }).addTo(this.stage);
         },
         gameReady() {
+            this.state = 'ready';
             this.score = 0;
             this.currentScore.visible = true;
             this.currentScore.setText(this.score);
             this.bird.getReady();
         },
         onUserInputStart: function(e) {
+            if(this.state === 'play') return
             this.startTime = +new Date()
             var me = this;
             var base = 1;
@@ -164,13 +166,23 @@
             }, 60)
         },
         onUserInputEnd: function(e) {
+            if(this.state === 'play') return
+            if(this.state === 'over') {
+                this.restartGame();
+            }
             clearInterval(this.inputTimes);
             Hilo.Tween.to(this.bird, {scaleX:1, scaleY:1}, {time:100});
             this.endTime = +new Date()
-            var diffTime = this.endTime - this.startTime
+            var diffTime = this.endTime - this.startTime;
+            this.state = 'play';
             this.bird.startFly(diffTime);
         },
+        restartGame() {
+            this.gameOverScene.hide();
+            this.gameReady();
+        },
         gameOver: function() {
+                this.state = 'over';
                 //显示结束场景
                 this.gameOverScene.show();
                 // 隐藏分数
@@ -178,6 +190,7 @@
         },
         flyDone() {
             if(this.holdbacks.collisionTest(this.bird)) {
+                this.state = 'ready';
                 this.score+=1;
                 this.currentScore.setText(this.score);
             }else {
